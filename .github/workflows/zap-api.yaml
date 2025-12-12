@@ -1,38 +1,43 @@
-name: ZAP API Scan (Debug)
+name: ZAP API Scan
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
 
 jobs:
   zap:
     runs-on: ubuntu-latest
+    name: zap
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Run ZAP API Scan (Debug Mode)
-        run: |
-          docker run \
-            -v $(pwd):/zap/wrk/:rw \
-            ghcr.io/zaproxy/zaproxy:stable \
-            zap-api-scan.py \
+    # 🔥 REQUIRED FIX
+    - name: Fix permissions for ZAP writing
+      run: sudo chmod -R 777 .
+
+    - name: Run ZAP API Scan with FULL HTTP LOGGING
+      run: |
+        docker run \
+          --name zap \
+          -v $(pwd):/zap/wrk/:rw \
+          -t ghcr.io/zaproxy/zaproxy:stable \
+          zap-api-scan.py \
             -t /zap/wrk/simple-testfire-post.yaml \
             -f openapi \
             -r zap-report.html \
-            -x zap-report.xml \
-            -d
+            -d \
+            --hook=/zap/wrk/log-all-traffic.py \
+            --zap-args="-addonupdate -addoninstall pscanrulesBeta -config api.disablekey=true -config logging.level=DEBUG"
 
-      - name: Upload ZAP HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-html-report
-          path: zap-report.html
+    - name: Export ALL ZAP HTTP messages
+      run: |
+        docker exec zap bash -c "zap-cli -p 8080 -l DEBUG messages > /zap/wrk/zap-messages.md"
 
-      - name: Upload ZAP XML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-xml-report
-          path: zap-report.xml
+    - name: Upload Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: zap-reports
+        path: |
+          zap-report.html
+          zap-messages.md
