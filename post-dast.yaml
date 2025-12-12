@@ -1,0 +1,25 @@
+jobs:
+  - type: requestor
+    name: send-post
+    parameters:
+      requests:
+        - url: "https://demo.testfire.net/login"
+          method: "POST"
+          data: "uid=admin&pass=admin"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+
+  - type: activeScan
+    name: active-scan
+    parameters:
+      context: ""
+      policy: "Default Policy"
+      scanHeaders: true
+      maxScanDurationInMins: 5
+
+  - type: report
+    name: report
+    parameters:
+      template: "traditional-html"
+      reportDir: "/zap/wrk/"
+      reportFile: "post-dast-report.html"
