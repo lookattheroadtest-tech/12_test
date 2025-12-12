@@ -24,6 +24,7 @@ jobs:
             zap-api-scan.py \
               -t /zap/wrk/simple-testfire-post.yaml \
               -f openapi \
+              --target https://demo.testfire.net/api/login \
               -d \
               -r /zap/wrk/zap-report.html \
               -J /zap/wrk/zap-report.json
