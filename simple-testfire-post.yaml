@@ -1,31 +1,22 @@
-openapi: 3.0.3
-info:
-  title: TestFire Login Form API
-  version: 1.0.0
+env:
+  contexts:
+    - name: testfire
+      urls:
+        - "https://demo.testfire.net"
+      includePaths:
+        - "https://demo.testfire.net/api/*"
 
-servers:
-  - url: https://demo.testfire.net
-
-paths:
-  /doLogin:
-    post:
-      summary: Login form POST
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                uid:
-                  type: string
-                passw:
-                  type: string
-              required:
-                - uid
-                - passw
-      responses:
-        "302":
-          description: Redirect after login
-        "200":
-          description: Login failed
+jobs:
+  - type: requestor
+    parameters:
+      context: testfire
+      requests:
+        - method: POST
+          url: "https://demo.testfire.net/api/login"
+          headers:
+            Content-Type: "application/json"
+          body: |
+            {
+              "username": "jsmith",
+              "password": "demo1234"
+            }
