@@ -1,4 +1,4 @@
-name: ZAP API Scan
+name: ZAP API Scan (Debug)
 
 on:
   workflow_dispatch:
@@ -6,17 +6,16 @@ on:
 jobs:
   zap:
     runs-on: ubuntu-latest
-    name: zap
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # 🔥 REQUIRED FIX
-    - name: Fix permissions for ZAP writing
+    # Required so ZAP container can write zap-report.html
+    - name: Fix permissions
       run: sudo chmod -R 777 .
 
-    - name: Run ZAP API Scan with FULL HTTP LOGGING
+    - name: Run ZAP API Scan
       run: |
         docker run \
           --name zap \
@@ -28,16 +27,11 @@ jobs:
             -r zap-report.html \
             -d \
             --hook=/zap/wrk/log-all-traffic.py \
-            --zap-args="-addonupdate -addoninstall pscanrulesBeta -config api.disablekey=true -config logging.level=DEBUG"
+            -z "-addonupdate -addoninstall pscanrulesBeta -config api.disablekey=true -config logging.level=DEBUG"
 
-    - name: Export ALL ZAP HTTP messages
-      run: |
-        docker exec zap bash -c "zap-cli -p 8080 -l DEBUG messages > /zap/wrk/zap-messages.md"
-
-    - name: Upload Report
+    - name: Upload reports
       uses: actions/upload-artifact@v4
       with:
         name: zap-reports
         path: |
           zap-report.html
-          zap-messages.md
