@@ -1,0 +1,25 @@
+env:
+  context:
+    name: "ctx"
+    urls:
+      - "https://demo.testfire.net"
+
+jobs:
+  - type: requestor
+    name: login-post
+    requests:
+      - url: "https://demo.testfire.net/login"
+        method: "POST"
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+        data: "uid=admin&pass=admin"
+
+  - type: activeScan
+    name: activescan
+    context: "ctx"
+
+  - type: report
+    name: htmlreport
+    parameters:
+      format: "HTML"
+      outfile: "zap-report.html"
