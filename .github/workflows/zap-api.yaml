@@ -8,30 +8,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    # Required so ZAP container can write zap-report.html
-    - name: Fix permissions
-      run: sudo chmod -R 777 .
+      - name: Run ZAP API Scan with hooks (POST debug)
+        run: |
+          docker run \
+            --tty \
+            --rm \
+            -v $(pwd):/zap/wrk/:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py \
+              -t /zap/wrk/simple-testfire-post.yaml \
+              -f openapi \
+              -d \
+              -I \
+              --hook=/zap/wrk/.zap/hooks.py \
+              -r zap-report.html \
+              -J zap-report.json
 
-    - name: Run ZAP API Scan
-      run: |
-        docker run \
-          --name zap \
-          -v $(pwd):/zap/wrk/:rw \
-          -t ghcr.io/zaproxy/zaproxy:stable \
-          zap-api-scan.py \
-            -t /zap/wrk/simple-testfire-post.yaml \
-            -f openapi \
-            -r zap-report.html \
-            -d \
-            --hook=/zap/wrk/log-all-traffic.py \
-            -z "-addonupdate -addoninstall pscanrulesBeta -config api.disablekey=true -config logging.level=DEBUG"
-
-    - name: Upload reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: zap-reports
-        path: |
-          zap-report.html
+      - name: Upload ZAP HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap-report.html
