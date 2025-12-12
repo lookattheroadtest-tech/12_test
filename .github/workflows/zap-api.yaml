@@ -1,4 +1,4 @@
-name: ZAP API Scan (verified)
+name: ZAP API Scan (single POST)
 
 on:
   workflow_dispatch:
@@ -13,22 +13,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run ZAP API Scan (verified flags only)
+      - name: Run ZAP Automation Plan
         run: |
           docker run --rm \
-            -v "${{ github.workspace }}:/zap/wrk" \
+            -v ${{ github.workspace }}:/zap/wrk \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-api-scan.py \
-              -t /zap/wrk/simple-testfire-post.yaml \
-              -f openapi \
-              -d \
-              -r /zap/wrk/zap-report.html \
-              -J /zap/wrk/zap-report.json
+            zap.sh -cmd -autorun /zap/wrk/simple-testfire-post.yaml
 
-      - name: Upload ZAP reports
+      - name: Upload ZAP Output
         uses: actions/upload-artifact@v4
         with:
-          name: zap-reports
+          name: zap-output
           path: |
-            zap-report.html
-            zap-report.json
+            *.log
+            *.html
+            *.json
+            *.md
