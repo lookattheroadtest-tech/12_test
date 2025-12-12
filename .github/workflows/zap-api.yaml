@@ -1,4 +1,4 @@
-name: ZAP API Scan (single POST)
+name: ZAP API Scan (verified)
 
 on:
   workflow_dispatch:
@@ -13,18 +13,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Ensure writable workspace for ZAP
-        run: sudo chmod -R 777 .
-
-      - name: Run ZAP API Scan (debug, HTML+JSON)
+      - name: Run ZAP API Scan (verified flags only)
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/zap/wrk:rw \
+            -v "${{ github.workspace }}:/zap/wrk" \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py \
               -t /zap/wrk/simple-testfire-post.yaml \
               -f openapi \
-              --target https://demo.testfire.net/api/login \
               -d \
               -r /zap/wrk/zap-report.html \
               -J /zap/wrk/zap-report.json
