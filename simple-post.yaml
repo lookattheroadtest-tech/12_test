@@ -1,27 +1,28 @@
+---
+version: "1.0"
+
 env:
-  context:
-    name: "ctx"
-    urls:
-      - "https://demo.testfire.net"
+  parameters: {}
 
 jobs:
   - type: requestor
     name: login-post
-    requests:
-      - url: "https://demo.testfire.net/login"
-        method: "POST"
-        headers:
-          Content-Type: "application/x-www-form-urlencoded"
-        data: "uid=admin&pass=admin"
-
-  - type: activeScan
-    name: active-scan
-    context: "ctx"
     parameters:
-      policy: "API-scan"
+      requests:
+        - url: "https://demo.testfire.net/login"
+          method: "POST"
+          body: "uid=admin&pass=admin"
+          headers:
+            Content-Type: "application/x-www-form-urlencoded"
+
+  - type: passiveScan-wait
+    name: wait-passive
+    parameters:
+      maxDuration: 60
 
   - type: report
-    name: html-report
+    name: report
     parameters:
-      format: "HTML"
-      outfile: "/zap/wrk/zap-report.html"
+      reportDir: "zap-report"
+      reportFile: "post-login.html"
+      template: "traditional-html"
