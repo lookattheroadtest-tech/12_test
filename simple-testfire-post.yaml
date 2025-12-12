@@ -3,16 +3,14 @@ env:
     - name: testfire
       urls:
         - "https://demo.testfire.net"
-      includePaths:
-        - "https://demo.testfire.net/api/*"
 
 jobs:
   - type: requestor
-    parameters:
-      context: testfire
+    name: "Single POST Login"
+    data:
       requests:
-        - method: POST
-          url: "https://demo.testfire.net/api/login"
+        - url: "https://demo.testfire.net/api/login"
+          method: "POST"
           headers:
             Content-Type: "application/json"
           body: |
