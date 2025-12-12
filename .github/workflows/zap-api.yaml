@@ -1,9 +1,7 @@
-name: ZAP API Scan (single POST)
+name: ZAP Simple POST Scan
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
 
 jobs:
   zap:
@@ -13,19 +11,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run ZAP Automation Plan
+      - name: Make workspace writable
+        run: sudo chmod -R 777 .
+
+      - name: Run ZAP with simple POST
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/zap/wrk \
+            -v "${{ github.workspace }}:/zap/wrk" \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap.sh -cmd -autorun /zap/wrk/simple-testfire-post.yaml
+            /zap/zap.sh -cmd -autorun /zap/wrk/simple-post.yaml
 
-      - name: Upload ZAP Output
+      - name: Upload ZAP reports
         uses: actions/upload-artifact@v4
         with:
           name: zap-output
-          path: |
-            *.log
-            *.html
-            *.json
-            *.md
+          path: "*.html"
