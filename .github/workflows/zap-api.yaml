@@ -21,8 +21,8 @@ jobs:
             ghcr.io/zaproxy/zaproxy:stable \
             /zap/zap.sh -cmd -autorun /zap/wrk/simple-post.yaml
 
-      - name: Upload ZAP reports
+      - name: Upload report
         uses: actions/upload-artifact@v4
         with:
           name: zap-output
-          path: "*.html"
+          path: zap-report.html
