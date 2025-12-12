@@ -1,29 +1,31 @@
 openapi: 3.0.3
 info:
-  title: TestFire Login API
+  title: TestFire Login Form API
   version: 1.0.0
 
 servers:
-  - url: https://demo.testfire.net/api
+  - url: https://demo.testfire.net
 
 paths:
-  /login:
+  /doLogin:
     post:
-      summary: Login
+      summary: Login form POST
       requestBody:
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                username:
+                uid:
                   type: string
-                password:
+                passw:
                   type: string
               required:
-                - username
-                - password
+                - uid
+                - passw
       responses:
+        "302":
+          description: Redirect after login
         "200":
-          description: OK
+          description: Login failed
