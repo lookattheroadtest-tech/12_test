@@ -13,11 +13,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run OWASP ZAP API Scan
+      - name: Run ZAP API Scan
         run: |
           docker run \
             -v $(pwd):/zap/wrk/:rw \
-            owasp/zap2docker-stable zap-api-scan.py \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py \
             -t /zap/wrk/simple-testfire-post.yaml \
             -f openapi \
             -r zap-report.html \
