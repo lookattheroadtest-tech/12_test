@@ -15,11 +15,13 @@ jobs:
         data: "uid=admin&pass=admin"
 
   - type: activeScan
-    name: activescan
+    name: active-scan
     context: "ctx"
+    parameters:
+      policy: "API-scan"
 
   - type: report
-    name: htmlreport
+    name: html-report
     parameters:
       format: "HTML"
-      outfile: "zap-report.html"
+      outfile: "/zap/wrk/zap-report.html"
