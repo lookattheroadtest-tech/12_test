@@ -1,7 +1,9 @@
-name: ZAP API Scan (Debug)
+name: ZAP API Scan (single POST)
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
 
 jobs:
   zap:
@@ -11,24 +13,25 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run ZAP API Scan with hooks (POST debug)
+      - name: Ensure writable workspace for ZAP
+        run: sudo chmod -R 777 .
+
+      - name: Run ZAP API Scan (debug, HTML+JSON)
         run: |
-          docker run \
-            --tty \
-            --rm \
-            -v $(pwd):/zap/wrk/:rw \
+          docker run --rm \
+            -v ${{ github.workspace }}:/zap/wrk:rw \
             ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py \
               -t /zap/wrk/simple-testfire-post.yaml \
               -f openapi \
               -d \
-              -I \
-              --hook=/zap/wrk/.zap/hooks.py \
-              -r zap-report.html \
-              -J zap-report.json
+              -r /zap/wrk/zap-report.html \
+              -J /zap/wrk/zap-report.json
 
-      - name: Upload ZAP HTML report
+      - name: Upload ZAP reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap-report
-          path: zap-report.html
+          name: zap-reports
+          path: |
+            zap-report.html
+            zap-report.json
